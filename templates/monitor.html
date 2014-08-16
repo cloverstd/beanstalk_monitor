@@ -1,0 +1,308 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<script>
+    var current = "monitor";
+</script>
+<table class="uk-table uk-table-hover uk-table-striped" id="servers-box">
+    <thead>
+        <tr>
+            <th name="server-name">Server Name</th>
+
+            <th style="display: none;" name="binlog-current-index">binlog-current-index</th>
+            <th style="display: none;" name="binlog-max-size">binlog-max-size</th>
+            <th style="display: none;" name="binlog-oldest-index">binlog-oldest-index</th>
+            <th style="display: none;" name="cmd-bury">cmd-bury</th>
+            <th style="display: none;" name="cmd-delete">cmd-delete</th>
+            <th style="display: none;" name="cmd-ignore">cmd-ignore</th>
+            <th style="display: none;" name="cmd-kick">cmd-kick</th>
+            <th style="display: none;" name="cmd-list-tube-used">cmd-list-tube-used</th>
+            <th style="display: none;" name="cmd-list-tubes">cmd-list-tubes</th>
+            <th style="display: none;" name="cmd-list-tubes-watched">cmd-list-tubes-watched</th>
+            <th style="display: none;" name="cmd-pause-tube">cmd-pause-tube</th>
+            <th style="display: none;" name="cmd-peek">cmd-peek-buried</th>
+            <th style="display: none;" name="cmd-peek-delayed">cmd-peek-delayed</th>
+            <th style="display: none;" name="cmd-release">cmd-release</th>
+            <th style="display: none;" name="cmd-reserve">cmd-reserve</th>
+            <th style="display: none;" name="cmd-reserve-with-timeout">cmd-reserve-with-timeout</th>
+            <th style="display: none;" name="cmd-stats">cmd-stats</th>
+            <th style="display: none;" name="cmd-stats-job">cmd-stats-job</th>
+            <th style="display: none;" name="cmd-stats-tube">cmd-stats-tube</th>
+            <th style="display: none;" name="cmd-touch">cmd-touch</th>
+            <th style="display: none;" name="cmd-use">cmd-use</th>
+            <th style="display: none;" name="cmd-watch">cmd-watch</th>
+
+            <th style="display: none;" name="current-connections">current-connections</th>
+            <th style="display: none;" name="current-jobs-buried">current-jobs-buried</th>
+            <th style="display: none;" name="current-jobs-delayed">current-jobs-delayed</th>
+            <th style="display: none;" name="current-jobs-ready">current-jobs-ready</th>
+            <th style="display: none;" name="current-jobs-reserved">current-jobs-reserved</th>
+            <th style="display: none;" name="current-jobs-urgent">current-jobs-urgent</th>
+            <th style="display: none;" name="current-producers">current-producers</th>
+            <th style="display: none;" name="current-tubes">current-tubes</th>
+            <th style="display: none;" name="current-waiting">current-waiting</th>
+            <th style="display: none;" name="current-workers">current-workers</th>
+            <th style="display: none;" name="job-timeouts">job-timeouts</th>
+            <th style="display: none;" name="max-job-size">max-job-size</th>
+            <th style="display: none;" name="pid">pid</th>
+            <th style="display: none;" name="rusage-stime">rusage-stime</th>
+            <th style="display: none;" name="rusage-utime">rusage-utime</th>
+            <th style="display: none;" name="total-connections">total-connections</th>
+            <th style="display: none;" name="total-jobs">total-jobs</th>
+            <th style="display: none;" name="uptime">uptime</th>
+            <th style="display: none;" name="version">version</th>
+
+            <th></th>
+
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <!--
+            <td>localhost:11300</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td><button type="button" class="uk-button uk-button-danger uk-button-mini"><i class="uk-icon-minus"></i></button></td>
+            -->
+        </tr>
+    </tbody>
+
+</table>
+<button class="uk-button uk-button-primary" data-uk-modal="{target:'#add-server-modal'}">Add Server</button>
+
+<div id="add-server-modal" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <h1>Add Server</h1>
+        <hr>
+        <form action="" class="uk-form uk-form-horizontal uk-container-center">
+            <div class="uk-form-row">
+                <label class="uk-form-label" for="new-server-name">Name</label>
+                <div class="uk-form-controls">
+                    <input type="text" id="new-server-name" placeholder="localhost:11300">
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label" for="new-server-host">Host</label>
+                <div class="uk-form-controls">
+                    <input type="text" id="new-server-host" placeholder="localhost">
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label" for="new-server-port">Host</label>
+                <div class="uk-form-controls">
+                    <input type="text" id="new-server-port" placeholder="11300">
+                </div>
+            </div>
+            <hr>
+            <div class="uk-clearfix">
+                <div class="uk-float-right">
+                    <button type="button" class="uk-button uk-button-primary" id="add-server-button">Add Server</button>
+                    <button type="button" class="uk-button uk-modal-close">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="filter-columns-modal" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <h1>Filter Columns</h1>
+        <hr>
+        <ul class="uk-tab" data-uk-tab="{connect:'#filter-columns-switcher'}">
+            <li><a href="javascript:void(0)">Binlog</a></li>
+            <li class="uk-active"><a href="">Cmd</a></li>
+            <li><a href="javascript:void(0)">Current</a></li>
+            <li><a href="javascript:void(0)">Other</a></li>
+        </ul>
+        <ul id="filter-columns-switcher" class="uk-switcher uk-margin">
+            <li>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="binlog-current-index"> <label for="form-h-c">binlog-current-index</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="binlog-max-size"> <label for="form-h-c">binlog-max-size</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="binlog-oldest-index"> <label for="form-h-c">binlog-oldest-index</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+            </li>
+            <li>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-bury"> <label>cmd-bury</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-delete"> <label>cmd-delete</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-ignore"> <label>cmd-ignore</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-kick"> <label>cmd-kick</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-list-tube-used"> <label>cmd-list-tube-used</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-list-tubes"> <label>cmd-list-tubes</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-list-tubes-watched"> <label>cmd-list-tubes-watched</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-pause-tube"> <label>cmd-pause-tube</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-peek-buried"> <label>cmd-peek-buried</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-peek-delayed"> <label>cmd-peek-delayed</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-release"> <label>cmd-release</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-reserve"> <label>cmd-reserve</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-reserve-with-timeout"> <label>cmd-reserve-with-timeout</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-stats"> <label>cmd-stats</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-stats-job"> <label>cmd-stats-job</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-stats-tube"> <label>cmd-stats-tube</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-touch"> <label>cmd-touch</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-use"> <label>cmd-use</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-watch"> <label>cmd-watch</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+            </li>
+            <li>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-connections"> <label>current-connections</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-jobs-buried"> <label>current-jobs-buried</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-jobs-delayed"> <label>current-jobs-delayed</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-jobs-ready"> <label>current-jobs-ready</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-jobs-reserved"> <label>current-jobs-reserved</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-jobs-urgent"> <label>current-jobs-urgent</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-producers"> <label>current-producers</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-tubes"> <label>current-tubes</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-waiting"> <label>current-waiting</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-workers"> <label>current-workers</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+            </li>
+            <li>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="job-timeouts"> <label>job-timeouts</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="max-job-size"> <label>max-job-size</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="pid"> <label>pid</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="rusage-stime"> <label>rusage-stime</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="rusage-utime"> <label>rusage-utime</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="total-connections"> <label>total-connections</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="total-jobs"> <label>total-jobs</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="uptime"> <label>uptime</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="version"> <label>version</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+<div id="settings-modal" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <h1>Settings</h1>
+    </div>
+</div>
+
+{% end %}

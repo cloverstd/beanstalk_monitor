@@ -1,0 +1,241 @@
+{% extends "layout.html" %}
+
+{% block navbar %}
+<li class="uk-parent" data-uk-dropdown>
+<a href="javascript:void(0);" class="server-name" data-name="{{ name }}">{{ name }} <i class="uk-icon-caret-down"></i></a>
+    <div class="uk-dropdown uk-dropdown-navbar">
+        <ul class="uk-nav uk-nav-navbar tube-menu-list">
+            {% for t in tubes %}
+            <li><a href="?tube={{ t }}">{{ t }}</a></li>
+            {% end %}
+        </ul>
+    </div>
+</li>
+{% end %}
+{% block content %}
+
+<script>
+    var current = "tube";
+</script>
+<table class="uk-table" id="tube-box">
+    <thead>
+        <tr>
+            <th name="name">name</th>
+            <th name="current-jobs-buried">current-jobs-buried</th>
+            <th name="current-jobs-delayed">current-jobs-delayed</th>
+            <th name="current-jobs-ready">current-jobs-ready</th>
+            <th name="current-jobs-reserved">current-jobs-reserved</th>
+            <th name="current-jobs-urgent">current-jobs-urgent</th>
+            <th name="current-waiting">current-waiting</th>
+            <th name="current-using">current-using</th>
+            <th name="total-jobs">total-jobs</th>
+            <th name="pause-time-left">pause-time-left</th>
+            <th name="cmd-pause-tube">cmd-pause-tube</th>
+            <th name="pause">pause</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td name="name">{{ stats_tube["name"] }}</th>
+            <td name="current-jobs-buried">{{ stats_tube["current-jobs-buried"] }}</td>
+            <td name="current-jobs-delayed">{{ stats_tube["current-jobs-delayed"] }}</td>
+            <td name="current-jobs-ready">{{ stats_tube["current-jobs-ready"] }}</td>
+            <td name="current-jobs-reserved">{{ stats_tube["current-jobs-reserved"] }}</td>
+            <td name="current-jobs-urgent">{{ stats_tube["current-jobs-urgent"] }}</td>
+            <td name="current-waiting">{{ stats_tube["current-waiting"] }}</td>
+            <td name="current-using">{{ stats_tube["current-using"] }}</td>
+            <td name="total-jobs">{{ stats_tube["total-jobs"] }}</td>
+            <td name="pause-time-left">{{ stats_tube["pause-time-left"] }}</td>
+            <td name="cmd-pause-tube">{{ stats_tube["cmd-pause-tube"] }}</td>
+            <td name="pause">{{ stats_tube["pause"] }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<b>Action:</b>
+<div class="uk-button-group">
+    <button class="uk-button"><i class="uk-icon-forward"></i> Kick 1 job</button>
+    <button class="uk-button"><i class="uk-icon-fast-forward"></i> Kick 10 job</button>
+    <button class="uk-button"><i class="uk-icon-pause"></i> Pause tube</button>
+</div>
+<div class="uk-button-group">
+    <button class="uk-button uk-button-success"><i class="uk-icon-plus-square"></i> Add job</button>
+    <div data-uk-dropdown="{mode:'hover'}">
+
+        <!-- This is the button toggling the dropdown -->
+        <button class="uk-button uk-button-success"><i class="uk-icon-caret-down"></i></button>
+        <!-- This is the dropdown -->
+        <div class="uk-dropdown uk-dropdown-small">
+            <ul class="uk-nav uk-nav-dropdown">
+                <li><a href="javascript:void(0);">There are no sample jobs</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+
+<div class="uk-grid" id="peek-ready">
+    <div class="uk-width-1-1">
+        <h3>Next job in "ready" state</h3>
+    </div>
+    {% if next_ready_job %}
+    <div class="uk-width-1-4">
+        <table class="uk-table">
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in next_ready_job.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td name="{{ key }}">{{ value }}</td>
+                    {% end %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="uk-width-3-4">
+        <div class="uk-clearfix">
+            <div class="uk-float-left"><b>Job body</b></div>
+            <div class="uk-float-right">
+                    <button class="uk-button uk-button-primary" data-uk-modal="{target:'#add-to-samples'}"><i class="uk-icon-plus"></i> Add to samples</button>
+                    <button class="uk-button uk-button-danger" id="delete-all-ready-jobs"><i class="uk-icon-trash-o"></i> Delete all ready jobs</button>
+                    <button class="uk-button uk-button-danger" id="delete-current-ready-job"><i class="uk-icon-minus"></i> Delete current ready jobs</button>
+            </div>
+        </div>
+        <div class="uk-progress" style="display:none;" id="delete-all-ready-jobs-progress">
+            <div class="uk-progress-bar" style="width: 0%;">0%</div>
+        </div>
+        <div class="uk-panel-box job-box">
+            {{ peek_ready["body"] }}
+        </div>
+    </div>
+    {% else %}
+    <div class="uk-width-1-1">
+        empty
+    </div>
+    {% end %}
+</div>
+
+<hr>
+<div class="uk-grid" id="peek-delayed">
+    <div class="uk-width-1-1">
+        <h3>Next job in "delayed" state</h3>
+    </div>
+    {% if next_delayed_job %}
+    <div class="uk-width-1-4">
+        <table class="uk-table">
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in next_delayed_job.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                    {% end %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="uk-width-3-4">
+        <div class="uk-clearfix">
+            <div class="uk-float-left"><b>Job body</b></div>
+            <div class="uk-float-right">
+                <button class="uk-button uk-button-primary"><i class="uk-icon-plus"></i> Add to samples</button>
+                <button class="uk-button uk-button-danger"><i class="uk-icon-trash"></i> Delete all delayed jobs</button>
+                <button class="uk-button uk-button-danger"><i class="uk-icon-remove"></i> Delte current delayed jobs</button>
+            </div>
+        </div>
+        <div class="uk-panel-box job-box">
+            {{ peek_delayed["body"] }}
+        </div>
+    </div>
+    {% else %}
+    <div class="uk-width-1-1">
+        empty
+    </div>
+    {% end %}
+</div>
+<hr>
+
+<div class="uk-grid" id="peek-buried">
+    <div class="uk-width-1-1">
+        <h3>Next job in "buried" state</h3>
+    </div>
+    {% if next_buried_job %}
+    <div class="uk-width-1-4">
+        <table class="uk-table">
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in next_buried_job.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                    {% end %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="uk-width-3-4">
+        <div class="uk-clearfix">
+            <div class="uk-float-left"><b>Job body</b></div>
+            <div class="uk-float-right">
+                <button class="uk-button uk-button-primary"><i class="uk-icon-plus"></i> Add to samples</button>
+                <button class="uk-button uk-button-danger"><i class="uk-icon-trash"></i> Delete all buried jobs</button>
+                <button class="uk-button uk-button-danger"><i class="uk-icon-remove"></i> Delte current buried jobs</button>
+            </div>
+        </div>
+        <div class="uk-panel-box job-box">
+            {{ peek_buried["body"] }}
+        </div>
+    </div>
+    {% else %}
+    <div class="uk-width-1-1">
+        empty
+    </div>
+    {% end %}
+</div>
+
+<div id="settings-modal" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <h1>Settings</h1>
+    </div>
+</div>
+
+<div id="add-to-samples" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <h1>Add to samples</h1>
+        <hr>
+        <div class="uk-grid">
+            <div class="uk-width-1-3">
+                Name *
+            </div>
+            <div class="uk-width-2-3">
+                <input type="text">
+            </div>
+            <div class="uk-width-1-1">
+                Available on tubes *
+            </div>
+            <div class="uk-width-1-1">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% end %}

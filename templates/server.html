@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+
+{% block navbar %}
+<li class="uk-parent" data-uk-dropdown>
+<a href="javascript:void(0);" class="server-name" data-name="{{ name }}">{{ name }} <i class="uk-icon-caret-down"></i></a>
+    <div class="uk-dropdown uk-dropdown-navbar">
+        <ul class="uk-nav uk-nav-navbar tube-menu-list">
+        </ul>
+    </div>
+</li>
+{% end %}
+{% block content %}
+
+<script>
+    var current = "server";
+</script>
+<div class="uk-clearfix">
+    <div class="uk-float-left">
+    </div>
+    <div class="uk-float-right">
+        <button class="uk-button uk-button-primary uk-width-1-1" id="auto-refresh"><i class="uk-icon-refresh"></i></button>
+    </div>
+</div>
+<table class="uk-table uk-table-hover uk-table-striped" id="tube-box">
+    <thead>
+        <tr>
+            <th name="name">name</th>
+            <th style="display: none;" name="current-jobs-buried">current-jobs-buried</th>
+            <th style="display: none;" name="current-jobs-delayed">current-jobs-delayed</th>
+            <th style="display: none;" name="current-jobs-ready">current-jobs-ready</th>
+            <th style="display: none;" name="current-jobs-reserved">current-jobs-reserved</th>
+            <th style="display: none;" name="current-jobs-urgent">current-jobs-urgent</th>
+            <th style="display: none;" name="current-waiting">current-waiting</th>
+            <th style="display: none;" name="current-using">current-using</th>
+            <th style="display: none;" name="total-jobs">total-jobs</th>
+            <th style="display: none;" name="pause-time-left">pause-time-left</th>
+            <th style="display: none;" name="cmd-pause-tube">cmd-pause-tube</th>
+            <th style="display: none;" name="pause">pause</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <!--
+            <td>localhost:11300</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td>1</td>
+            <td><button type="button" class="uk-button uk-button-danger uk-button-mini"><i class="uk-icon-minus"></i></button></td>
+            -->
+        </tr>
+    </tbody>
+
+</table>
+
+<div id="filter-columns-modal" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <h1>Filter Columns</h1>
+        <hr>
+        <ul class="uk-tab" data-uk-tab="{connect:'#filter-columns-switcher'}">
+            <li><a class="uk-active" href="javascript:void(0)">Current</a></li>
+            <li><a href="javascript:void(0)">Other</a></li>
+        </ul>
+        <ul id="filter-columns-switcher" class="uk-switcher uk-margin">
+            <li>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-jobs-buried"> <label>current-jobs-buried</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-jobs-delayed"> <label>current-jobs-delayed</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-jobs-ready"> <label>current-jobs-ready</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-jobs-reserved"> <label>current-jobs-reserved</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-jobs-urgent"> <label>current-jobs-urgent</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-waiting"> <label>current-waiting</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="current-using"> <label>current-using</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+            </li>
+            <li>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="total-jobs"> <label>total-jobs</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="pause-time-left"> <label>pause-time-left</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="cmd-pause-tube"> <label>cmd-pause-tube</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+                <div class="uk-form-controls">
+                    <input type="checkbox" name="pause"> <label>pause</label>
+                    <p class="uk-form-help-block">this is a help</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+<div id="settings-modal" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <a class="uk-modal-close uk-close"></a>
+        <h1>Settings</h1>
+    </div>
+</div>
+
+
+{% end %}
