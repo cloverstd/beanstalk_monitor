@@ -321,7 +321,7 @@
           var serverList = store.get("servers-list");
           var $ul = $(".server-menu-list");
           $.each(serverList, function(i, e) {
-            $ul.append("<li><a href='" + e.host + ":" + e.port + "'>" + e.name + "</a></li>");
+            $ul.append("<li><a href='/monitor/" + e.host + ":" + e.port + "'>" + e.name + "</a></li>");
           });
         }
       });
@@ -413,7 +413,6 @@
             client_id: $(".server-name").data("name"),
             tube_name: $("td[name=name]").text()
           };
-          console.log("hi");
           conn.send(JSON.stringify({
                   type: "delete-current-ready-job",
                   data: data
