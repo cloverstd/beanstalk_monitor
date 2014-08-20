@@ -74,6 +74,9 @@
                 $("#delete-all-ready-jobs-progress").find(".uk-progress-bar").width(percent);
                 $("#delete-all-ready-jobs-progress").find(".uk-progress-bar").text(percent);
                 if (message.data == 100) {
+                  if (current == "tube") {
+                    window.location.reload();
+                  }
                   $("#delete-all-ready-jobs-progress").fadeOut();
                   $.UIkit.notify({
                       message: "<i class='uk-icon-check'></i> Delete all jobs of " + message.data + ".",

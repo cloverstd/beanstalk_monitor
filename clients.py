@@ -139,7 +139,7 @@ class Clients(object):
             yield client.delete(job["id"])
 
             next_job = yield client.peek_ready()
-            if isinstance(job, beanstalkt.CommandFailed):  # no job
+            if isinstance(next_job, beanstalkt.CommandFailed):  # no job
                 message = dict(type="delete-current-ready-job",
                                data=dict(next_job=None))
                 self.broadcast(browsers, message)
