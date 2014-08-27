@@ -176,6 +176,120 @@ class Clients(object):
                 self.broadcast(browsers, message)
                 job = yield client.reserve(timeout=0)
 
+    @coroutine
+    def delete_all_delayed_jobs(self, client_id, tube):
+        if self.beanstalk_clients.get(client_id):
+            client = self.beanstalk_clients[client_id].client
+            yield client.watch(tube)
+            num = yield client.kick()
+            if num == 0:
+                return
+            job = yield client.reserve(timeout=0)
+            browsers = self.beanstalk_clients[client_id].browsers
+
+            stats_tube = yield client.stats_tube(tube)
+            jobs_total = stats_tube["current-jobs-delayed"]
+            while job:
+                if isinstance(job, beanstalkt.TimedOut):  # no job
+                    break
+
+                yield client.delete(job["id"])
+                stats_tube = yield client.stats_tube(tube)
+                jobs_current = stats_tube["current-jobs-delayed"]
+                percent = 100.0 * jobs_current / jobs_total
+                message = dict(type="delete-delayed-job-progress",
+                               data=100 - percent)
+                self.broadcast(browsers, message)
+
+                num = yield client.kick()
+                if num == 0:
+                    break
+
+                job = yield client.reserve(timeout=0)
+
+    @coroutine
+    def delete_current_delayed_job(self, client_id, tube):
+        if self.beanstalk_clients.get(client_id):
+            client = self.beanstalk_clients[client_id].client
+            yield client.watch(tube)
+            num = yield client.kick()
+            if num == 0:
+                return
+
+            job = yield client.reserve(timeout=0)
+            browsers = self.beanstalk_clients[client_id].browsers
+            if isinstance(job, beanstalkt.TimedOut):  # no job
+                return
+
+            yield client.delete(job["id"])
+
+            next_job = yield client.peek_delayed()
+            if isinstance(next_job, beanstalkt.CommandFailed):  # no job
+                message = dict(type="delete-current-delayed-job",
+                               data=dict(next_job=None))
+                self.broadcast(browsers, message)
+                return
+
+            job_info = yield client.stats_job(next_job["id"])
+            stats_tube = yield client.stats_tube(tube)
+
+            message = dict(type="delete-current-delayed-job",
+                           data=dict(next_job=job_info,
+                                     stats_tube=stats_tube))
+            self.broadcast(browsers, message)
+
+    @coroutine
+    def delete_current_buried_job(self, client_id, tube):
+        if self.beanstalk_clients.get(client_id):
+            client = self.beanstalk_clients[client_id].client
+            yield client.watch(tube)
+
+            job = yield client.peek_buried()
+            browsers = self.beanstalk_clients[client_id].browsers
+            if isinstance(job, beanstalkt.CommandFailed):  # no job
+                return
+
+            yield client.delete(job["id"])
+
+            next_job = yield client.peek_buried()
+            if isinstance(next_job, beanstalkt.CommandFailed):  # no job
+                message = dict(type="delete-current-buried-job",
+                               data=dict(next_job=None))
+                self.broadcast(browsers, message)
+                return
+
+            job_info = yield client.stats_job(next_job["id"])
+            stats_tube = yield client.stats_tube(tube)
+
+            message = dict(type="delete-current-buried-job",
+                           data=dict(next_job=job_info,
+                                     stats_tube=stats_tube))
+            self.broadcast(browsers, message)
+
+    @coroutine
+    def delete_all_buried_jobs(self, client_id, tube):
+        if self.beanstalk_clients.get(client_id):
+            client = self.beanstalk_clients[client_id].client
+            yield client.watch(tube)
+            job = yield client.peek_buried()
+            browsers = self.beanstalk_clients[client_id].browsers
+
+            stats_tube = yield client.stats_tube(tube)
+            jobs_total = stats_tube["current-jobs-buried"]
+            while job:
+                if isinstance(job, beanstalkt.CommandFailed):  # no job
+                    break
+
+                yield client.delete(job["id"])
+                stats_tube = yield client.stats_tube(tube)
+                jobs_current = stats_tube["current-jobs-buried"]
+                percent = 100.0 * jobs_current / jobs_total
+                message = dict(type="delete-buried-job-progress",
+                               data=100 - percent)
+                self.broadcast(browsers, message)
+
+                job = yield client.peek_buried()
+
     def add_browser(self, browser_id, page):
         if not self.browsers.get(browser_id):
             self.browsers[browser_id] = dict(pages=set(),

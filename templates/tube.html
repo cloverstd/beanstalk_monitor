@@ -89,13 +89,13 @@
                     <th>Value</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="ready-job-status">
                 {% for key, value in next_ready_job.items() %}
                 <tr>
                     <td>{{ key }}</td>
                     <td name="{{ key }}">{{ value }}</td>
-                    {% end %}
                 </tr>
+                {% end %}
             </tbody>
         </table>
     </div>
@@ -136,13 +136,13 @@
                     <th>Value</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="delayed-job-status">
                 {% for key, value in next_delayed_job.items() %}
                 <tr>
                     <td>{{ key }}</td>
-                    <td>{{ value }}</td>
-                    {% end %}
+                    <td name="{{ key }}">{{ value }}</td>
                 </tr>
+                {% end %}
             </tbody>
         </table>
     </div>
@@ -151,9 +151,12 @@
             <div class="uk-float-left"><b>Job body</b></div>
             <div class="uk-float-right">
                 <button class="uk-button uk-button-primary"><i class="uk-icon-plus"></i> Add to samples</button>
-                <button class="uk-button uk-button-danger"><i class="uk-icon-trash"></i> Delete all delayed jobs</button>
-                <button class="uk-button uk-button-danger"><i class="uk-icon-remove"></i> Delte current delayed jobs</button>
+                <button class="uk-button uk-button-danger" id="delete-all-delayed-jobs"><i class="uk-icon-trash-o"></i> Delete all delayed jobs</button>
+                <button class="uk-button uk-button-danger" id="delete-current-delayed-job"><i class="uk-icon-minus"></i> Delete current delayed jobs</button>
             </div>
+        </div>
+        <div class="uk-progress" style="display:none;" id="delete-all-delayed-jobs-progress">
+            <div class="uk-progress-bar" style="width: 0%;">0%</div>
         </div>
         <div class="uk-panel-box job-box">
             {{ peek_delayed["body"] }}
@@ -180,13 +183,13 @@
                     <th>Value</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="buried-job-status">
                 {% for key, value in next_buried_job.items() %}
                 <tr>
                     <td>{{ key }}</td>
-                    <td>{{ value }}</td>
-                    {% end %}
+                    <td name="{{ key }}">{{ value }}</td>
                 </tr>
+                {% end %}
             </tbody>
         </table>
     </div>
@@ -195,9 +198,12 @@
             <div class="uk-float-left"><b>Job body</b></div>
             <div class="uk-float-right">
                 <button class="uk-button uk-button-primary"><i class="uk-icon-plus"></i> Add to samples</button>
-                <button class="uk-button uk-button-danger"><i class="uk-icon-trash"></i> Delete all buried jobs</button>
-                <button class="uk-button uk-button-danger"><i class="uk-icon-remove"></i> Delte current buried jobs</button>
+                <button class="uk-button uk-button-danger" id="delete-all-buried-jobs"><i class="uk-icon-trash-o"></i> Delete all delayed jobs</button>
+                <button class="uk-button uk-button-danger" id="delete-current-buried-job"><i class="uk-icon-minus"></i> Delete current delayed jobs</button>
             </div>
+        </div>
+        <div class="uk-progress" style="display:none;" id="delete-all-buried-jobs-progress">
+            <div class="uk-progress-bar" style="width: 0%;">0%</div>
         </div>
         <div class="uk-panel-box job-box">
             {{ peek_buried["body"] }}

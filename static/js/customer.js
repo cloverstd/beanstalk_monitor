@@ -70,14 +70,28 @@
               case "delete-all-ready-jobs-success":
                 break;
               case "delete-ready-job-progress":
+              case "delete-delayed-job-progress":
+              case "delete-buried-job-progress":
+               var type;
+                switch (message.type) {
+                  case "delete-ready-job-progress":
+                    type = "ready";
+                    break;
+                  case "delete-delayed-job-progress":
+                    type = "delayed";
+                    break;
+                  case "delete-buried-job-progress":
+                    type = "buried";
+                    break;
+                }
                 var percent = String(message.data).slice(0, 2) + "%";
-                $("#delete-all-ready-jobs-progress").find(".uk-progress-bar").width(percent);
-                $("#delete-all-ready-jobs-progress").find(".uk-progress-bar").text(percent);
+                $("#delete-all-" + type + "-jobs-progress").find(".uk-progress-bar").width(percent);
+                $("#delete-all-" + type + "-jobs-progress").find(".uk-progress-bar").text(percent);
                 if (message.data == 100) {
                   if (current == "tube") {
                     window.location.reload();
                   }
-                  $("#delete-all-ready-jobs-progress").fadeOut();
+                  $("#delete-all-" + type + "-jobs-progress").fadeOut();
                   $.UIkit.notify({
                       message: "<i class='uk-icon-check'></i> Delete all jobs of " + message.data + ".",
                       status: 'success',
@@ -87,9 +101,22 @@
                 }
                 break;
               case "delete-current-ready-job":
+              case "delete-current-delayed-job":
+              case "delete-current-buried-job":
                 if (message.data.next_job) {
                   $.each(message.data.next_job, function(key, value) {
-                    var td = $("td[name=" + key + "]");
+                    var td;
+                    switch (message.type) {
+                      case "delete-current-delayed-job":
+                        td = $("#delayed-job-status td[name=" + key + "]");
+                        break;
+                      case "delete-current-ready-job":
+                        td = $("#ready-job-status td[name=" + key + "]");
+                        break;
+                      case "delete-current-buried-job":
+                        td = $("#buried-job-status td[name=" + key + "]");
+                        break;
+                    }
                     var color = td.css('background-color');
                     if (td.data("prev") != value) {
                       td.css({
@@ -418,6 +445,50 @@
           };
           conn.send(JSON.stringify({
                   type: "delete-current-ready-job",
+                  data: data
+                  }));
+      });
+      $(document).on("click", "#delete-current-delayed-job", function() {
+          var data = {
+            client_id: $(".server-name").data("name"),
+            tube_name: $("td[name=name]").text()
+          };
+          conn.send(JSON.stringify({
+                  type: "delete-current-delayed-job",
+                  data: data
+                  }));
+      });
+      $(document).on("click", "#delete-all-delayed-jobs", function() {
+          var data = {
+            client_id: $(".server-name").data("name"),
+            tube_name: $("td[name=name]").text()
+          };
+          $("#delete-all-delayed-jobs-progress").fadeIn();
+          $("#delete-all-delayed-jobs-progress").find(".uk-progress-bar").text("0%");
+          conn.send(JSON.stringify({
+                  type: "delete-all-delayed-jobs",
+                  data: data
+                  }));
+      });
+      $(document).on("click", "#delete-current-buried-job", function() {
+          var data = {
+            client_id: $(".server-name").data("name"),
+            tube_name: $("td[name=name]").text()
+          };
+          conn.send(JSON.stringify({
+                  type: "delete-current-buried-job",
+                  data: data
+                  }));
+      });
+      $(document).on("click", "#delete-all-buried-jobs", function() {
+          var data = {
+            client_id: $(".server-name").data("name"),
+            tube_name: $("td[name=name]").text()
+          };
+          $("#delete-all-buried-jobs-progress").fadeIn();
+          $("#delete-all-buried-jobs-progress").find(".uk-progress-bar").text("0%");
+          conn.send(JSON.stringify({
+                  type: "delete-all-buried-jobs",
                   data: data
                   }));
       });

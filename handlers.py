@@ -114,6 +114,22 @@ class MonitorConnection(SockJSConnection):
             client_id = data["client_id"]
             tube_name = data["tube_name"].strip()
             yield clients.delete_current_ready_job(client_id, tube_name)
+        elif msg_type == "delete-current-delayed-job":
+            client_id = data["client_id"]
+            tube_name = data["tube_name"].strip()
+            yield clients.delete_current_delayed_job(client_id, tube_name)
+        elif msg_type == "delete-all-delayed-jobs":
+            client_id = data["client_id"]
+            tube_name = data["tube_name"].strip()
+            yield clients.delete_all_delayed_jobs(client_id, tube_name)
+        elif msg_type == "delete-current-buried-job":
+            client_id = data["client_id"]
+            tube_name = data["tube_name"].strip()
+            yield clients.delete_current_buried_job(client_id, tube_name)
+        elif msg_type == "delete-all-buried-jobs":
+            client_id = data["client_id"]
+            tube_name = data["tube_name"].strip()
+            yield clients.delete_all_buried_jobs(client_id, tube_name)
 
         else:
             print "undefined message type:", message["type"]
